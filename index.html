@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#000000">
+<title>❤️ — 3D</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body oncontextmenu="return false;">
+<canvas id="c"></canvas>
+<video id="v" playsinline muted disablePictureInPicture controlsList="nodownload noplaybackrate" oncontextmenu="return false;"></video>
+<audio id="bgMusic" src="songend.mp3" loop preload="auto" autoplay controlsList="nodownload noplaybackrate" oncontextmenu="return false;"></audio>
+<div id="privacyShield">
+  <div class="ps-icon">🔒</div>
+  <div>Экран корголгон</div>
+  <div class="ps-sub">Улантуу үчүн терезеге кайтыңыз</div>
+</div>
+
+<div id="camPreviewWrap" title="Отслеживание жестов руки">
+  <canvas id="camCanvas" width="360" height="270"></canvas>
+</div>
+
+<div id="questOverlay">
+  <div class="quest-card" id="questCard">
+    <div class="quest-step active" id="qStepCam">
+      <div class="q-badge">📷 Камерага уруксат</div>
+      <div class="q-title">Камераны күйгүзүү</div>
+      <div class="q-sub" id="qSubCam">Сайтты ачуу үчүн камерага уруксат бериңиз. Уруксат берилмейинче сайт ачылбайт.</div>
+      <div class="q-hint" id="qHintCam"></div>
+      <button type="button" class="q-btn" id="qBtnCam">Уруксат берүү 📷</button>
+    </div>
+
+    <div class="quest-step" id="qStep1">
+      <div class="q-badge">✨ 3D Кирүү</div>
+      <div class="q-title">Атыныз ким?</div>
+      <div class="q-sub">Улантуу үчүн өз атыңызды жазыңыз</div>
+      <input type="text" id="qNameInput" class="q-input" placeholder="Атыңыз..." autocomplete="off" spellcheck="false">
+      <div class="q-hint" id="qHint1"></div>
+      <button type="button" class="q-btn" id="qBtn1">Улантуу ✨</button>
+    </div>
+
+    <div class="quest-step" id="qStep2">
+      <div class="q-badge">🔐 Текшерүү коду</div>
+      <div class="q-title">Почтаны текшерүү</div>
+      <div class="q-sub" id="qMaskedMailMsg">Код <strong id="qMaskedMail">k***19@gmail.com</strong> почтасына жөнөтүлдү</div>
+      <input type="text" id="qCodeInput" class="q-input code-pin" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="one-time-code">
+      <div class="q-hint" id="qHint2"></div>
+      <button type="button" class="q-btn" id="qBtn2">Текшерүү ✨</button>
+    </div>
+
+    <div class="quest-step" id="qStep3">
+      <div class="q-badge">🎂 Туулган күн</div>
+      <div class="q-title">Туулган күнүң</div>
+      <div class="q-sub">Календардан туулган күнүңдү танда</div>
+      <div class="cal-wrap">
+        <div class="cal-header">
+          <button type="button" class="cal-nav" id="calPrev" title="Мурунку ай">‹</button>
+          <div class="cal-selects">
+            <select id="calMonth" class="cal-sel"></select>
+            <select id="calYear" class="cal-sel"></select>
+          </div>
+          <button type="button" class="cal-nav" id="calNext" title="Кийинки ай">›</button>
+        </div>
+        <div class="cal-weekdays">
+          <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+        </div>
+        <div class="cal-days" id="calDays"></div>
+        <div class="cal-picked" id="calPickedLabel">Датаны тандаңыз</div>
+      </div>
+      <div class="q-hint" id="qHint3"></div>
+      <button type="button" class="q-btn" id="qBtn3">Ачуу ✨</button>
+    </div>
+  </div>
+</div>
+
+<div id="confessionOverlay">
+  <div class="confess-stage" id="confessStage">
+    <div class="confess-dots" id="confessDots"></div>
+    <div class="confess-text" id="confessText"></div>
+
+    <div class="confess-arrow-wrap" id="confessArrowWrap">
+      <button type="button" class="confess-arrow-btn" id="confessNextBtn" title="Кийинки сөз">↓</button>
+      <div class="confess-scroll-hint">Ылдый басыңыз же скролл кылыңыз</div>
+    </div>
+  </div>
+</div>
+
+<div id="hud" class="hidden">
+  <div class="status-pill">
+    <span class="dot" id="camDot"></span>
+    <span id="camLabel">Мышь (зажмите ЛКМ = Кулак)</span>
+  </div>
+  <button class="mode-btn music-btn" id="musicBtn" title="Включить / выключить фоновую музыку [M]">🎵 Музыка<span class="kb-hint"> [M]</span></button>
+  <button class="mode-btn active" data-mode="0">🖐 Сердце<span class="kb-hint"> [1]</span></button>
+  <button class="mode-btn" data-mode="1">☝️ Поток<span class="kb-hint"> [2]</span></button>
+  <button class="mode-btn" data-mode="2" id="logoModeBtn">✊ Фото 3D<span class="kb-hint"> [3]</span></button>
+  <button class="mode-btn" data-mode="3">🤘 Сердцепад<span class="kb-hint"> [4]</span></button>
+</div>
+
+<script src="js/three.min.js"></script>
+<script src="js/CopyShader.js"></script>
+<script src="js/LuminosityHighPassShader.js"></script>
+<script src="js/EffectComposer.js"></script>
+<script src="js/RenderPass.js"></script>
+<script src="js/ShaderPass.js"></script>
+<script src="js/UnrealBloomPass.js"></script>
+<script src="js/hands.js"></script>
+<script src="js/oshsu-logo-data.js"></script>
+<script src="js/sai-data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
